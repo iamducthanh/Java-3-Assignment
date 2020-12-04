@@ -3,13 +3,34 @@ package form;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+import javax.sql.rowset.serial.SerialBlob;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -28,6 +49,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 public class QLSV extends JFrame {
@@ -52,6 +74,11 @@ public class QLSV extends JFrame {
 	JPanel panel_2 = new JPanel();
 	static QLSV frame;
 	static ArrayList<Students> listStudent = new ArrayList<Students>();
+	JRadioButton rdbtnNam = new JRadioButton("Nam");
+	JRadioButton rdbtnNu = new JRadioButton("Nữ");
+	JTextArea textDiaChi = new JTextArea();
+	JLabel lblAvatar = new JLabel("New label");
+	byte[] imageByte = null;
 
 	/**
 	 * Launch the application.
@@ -215,12 +242,10 @@ public class QLSV extends JFrame {
 			}
 		});
 
-		JRadioButton rdbtnNam = new JRadioButton("Nam");
 		rdbtnNam.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		rdbtnNam.setBounds(175, 180, 60, 23);
 		panel.add(rdbtnNam);
 
-		JRadioButton rdbtnNu = new JRadioButton("Nữ");
 		rdbtnNu.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		rdbtnNu.setBounds(235, 180, 111, 23);
 		panel.add(rdbtnNu);
@@ -229,7 +254,6 @@ public class QLSV extends JFrame {
 		scrollPane.setBounds(165, 216, 230, 69);
 		panel.add(scrollPane);
 
-		JTextArea textDiaChi = new JTextArea();
 		textDiaChi.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textDiaChi.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		scrollPane.setViewportView(textDiaChi);
@@ -260,7 +284,6 @@ public class QLSV extends JFrame {
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 
-		JLabel lblAvatar = new JLabel("New label");
 		lblAvatar.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\user.jpg"));
 		lblAvatar.setBounds(6, 6, 115, 147);
@@ -492,15 +515,175 @@ public class QLSV extends JFrame {
 		btnDangXuat.addActionListener(logout);
 		mntmDangXuat.addActionListener(logout);
 		rdbtnNam.setSelected(true);
+		btnSave.addActionListener(save);
+		
+		lblAvatar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileFilter(new FileFilter() {
+					
+					@Override
+					public String getDescription() {
+						// TODO Auto-generated method stub
+						return "Image file (*.jpg)";
+					}
+					
+					@Override
+					public boolean accept(File f) {
+						// TODO Auto-generated method stub
+						if(f.isDirectory()) {
+							return true;
+						} else {
+							return f.getName().toLowerCase().endsWith(".jpg");
+						}
+					}
+				});
+				int rVal = chooser.showOpenDialog(null);
+				
+				if(rVal == 0) {
+					ImageIcon icon = new ImageIcon(chooser.getSelectedFile().getPath());
+					Image img = ImageEdit.resize(icon.getImage(), lblAvatar.getWidth(), lblAvatar.getHeight());
+					ImageIcon resizeIcon = new ImageIcon(img);
+					lblAvatar.setIcon(resizeIcon);
+					try {
+						imageByte = ImageEdit.getByteImage(img, "jpg");
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		loadData();
+		loadTable();
+		try {
+			display(0);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	
-	ActionListener add = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			
-			StringBuilder error = new StringBuilder();
+	
+	
+	public byte[] extractBytes (File imgPath) throws IOException {
+	    // open image
+	    BufferedImage bufferedImage = ImageIO.read(imgPath);
 
+	    // get DataBufferBytes from Raster
+	    WritableRaster raster = bufferedImage .getRaster();
+	    DataBufferByte data   = (DataBufferByte) raster.getDataBuffer();
+
+	    return ( data.getData() );
+	}
+	
+	private BufferedImage createImageFromBytes(byte[] imageData) {
+	    ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
+	    try {
+	        return ImageIO.read(bais);
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
+	
+	ActionListener save = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {		
+			StringBuilder error = new StringBuilder();
+			String maSV = textMaSV.getText();
+			String hoTen = textHoTen.getText();
+			String email = textEmail.getText();
+			String soDT = textSoDT.getText();
+			String gioiTinh = rdbtnNam.isSelected() == true ? "Nam" : "Nữ";
+			String diaChi = textDiaChi.getText();
+			
+			error.append(Validate.checkMa(maSV));
+			error.append(Validate.checkTen(hoTen));
+			error.append(Validate.checkEmail(email));
+			error.append(Validate.checkSoDT(soDT));
+			error.append(Validate.checkDiaChi(diaChi));
+			if(!error.toString().isBlank()) {
+				JOptionPane.showMessageDialog(null, error, "Lỗi", JOptionPane.ERROR_MESSAGE);
+			} else {
+				try {
+					Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+					Connection connection = DriverManager.getConnection("jdbc:sqlserver://127.0.0.1:1433;databaseName=QLSV", "sa", "123");
+					PreparedStatement insert = connection.prepareStatement("INSERT INTO SinhVien VALUES (?,?,?,?,?,?,?)");
+					insert.setString(1, maSV);
+					insert.setString(2, hoTen);
+					insert.setString(3, email);
+					insert.setString(4, soDT);
+					insert.setString(5, gioiTinh);
+					insert.setString(6, diaChi);
+					if(imageByte == null) {
+						Blob hinh = null;
+						insert.setBlob(7, hinh);
+					} else {
+						insert.setBlob(7, new SerialBlob(imageByte));
+					}
+					insert.execute();
+					connection.close();
+					imageByte = null;
+					loadData();
+					loadTable();
+					display(0);
+					
+				
+				} catch (ClassNotFoundException | SQLException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
 		}
 	};
+	
+	public void loadData() {
+		try {
+			listStudent.removeAll(listStudent);
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			Connection connection = DriverManager.getConnection("jdbc:sqlserver://127.0.0.1:1433;databaseName=QLSV", "sa", "123");
+			Statement statement = connection.createStatement();
+			ResultSet tbStudent = statement.executeQuery("SELECT * FROM SinhVien");
+			while(tbStudent.next()) {
+				String maSV = tbStudent.getString(1);
+				String hoTen = tbStudent.getString(2);
+				String email = tbStudent.getString(3);
+				String soDT = tbStudent.getString(4);
+				String gioiTinh = tbStudent.getString(5);
+				String diaChi = tbStudent.getString(6);
+				byte[] hinh = tbStudent.getBytes(7);
+				listStudent.add(new Students(maSV, hoTen, email, soDT, gioiTinh, diaChi, hinh));
+			}
+			connection.close();
+			
+		} catch (ClassNotFoundException | SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+	
+	public void loadTable() {
+		model1.setRowCount(0);
+		listStudent.forEach((ST)->{
+			model1.addRow(new Object[] {ST.maSV, ST.hoTen, ST.email, ST.soDT, ST.gioiTinh, ST.diaChi});
+		});
+		table.setModel(model1);
+	}
+	
+	public void display(int i) throws IOException {
+		textMaSV.setText(listStudent.get(i).maSV);
+		textHoTen.setText(listStudent.get(i).hoTen);
+		textEmail.setText(listStudent.get(i).email);
+		textSoDT.setText(listStudent.get(i).soDT);
+		textMaSV.setText(listStudent.get(i).diaChi);
+		if(listStudent.get(i).gioiTinh.equals("Nam")) {
+			rdbtnNam.setSelected(true);
+		} else rdbtnNu.setSelected(true);
+		Image icon = ImageEdit.getImage(listStudent.get(i).hinh, "img");
+		ImageIcon imageIcon = new ImageIcon(icon);
+		lblAvatar.setIcon(imageIcon);
+		table.setRowSelectionInterval(i, i);
+	}
 
 	ActionListener logout = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -537,7 +720,6 @@ public class QLSV extends JFrame {
 		model1.addColumn("Số ĐT");
 		model1.addColumn("Giới tính");
 		model1.addColumn("Địa chỉ");
-		model1.addColumn("Hình");
 		table.setModel(model1);
 	}
 }
