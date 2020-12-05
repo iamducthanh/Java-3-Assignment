@@ -29,6 +29,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import help.DataBaseConnection;
+
 @SuppressWarnings("serial")
 public class Login extends JFrame {
 	private JPanel contentPane;
@@ -44,7 +46,7 @@ public class Login extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void mainLogin() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -208,8 +210,7 @@ public class Login extends JFrame {
 	
 	public void loadUser() {
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			Connection connection = DriverManager.getConnection("jdbc:sqlserver://127.0.0.1:1433;databaseName=QLSV","sa","123");
+			Connection connection = DataBaseConnection.Connect();
 			Statement statement = connection.createStatement();
 			ResultSet tbUser = statement.executeQuery("SELECT * FROM NguoiDung");
 			while(tbUser.next()) {
