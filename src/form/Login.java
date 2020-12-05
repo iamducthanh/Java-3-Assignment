@@ -10,7 +10,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -140,6 +139,7 @@ public class Login extends JFrame {
 		});
 
 		textPassword.addFocusListener(new FocusAdapter() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (textPassword.getText().equals(" Password")) {
@@ -147,6 +147,7 @@ public class Login extends JFrame {
 				}
 			}
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void focusLost(FocusEvent e) {
 				if (textPassword.getText().equals("")) {
@@ -208,6 +209,7 @@ public class Login extends JFrame {
 		loadUser();
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	public void loadUser() {
 		try {
 			Connection connection = DataBaseConnection.Connect();
@@ -230,6 +232,7 @@ public class Login extends JFrame {
 	public void login() {
 		login = false;
 		String username = textUsername.getText();
+		@SuppressWarnings("deprecation")
 		String password = textPassword.getText();
 		listUser.forEach((user) -> {
 			if(user.username.equals(username)) {

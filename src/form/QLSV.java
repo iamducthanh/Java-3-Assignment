@@ -11,10 +11,10 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -42,8 +42,9 @@ import javax.swing.table.DefaultTableModel;
 import dao.StudentDao;
 import help.ImageEdit;
 
+@SuppressWarnings("serial")
 public class QLSV extends JFrame {
-
+	int current = 0;
 	private JPanel contentPane;
 	private JTextField textMaSV;
 	private JTextField textHoTen;
@@ -64,11 +65,14 @@ public class QLSV extends JFrame {
 	JPanel panelQLD = new JPanel();
 	static QLSV frame;
 	static ArrayList<Students> listStudent = new ArrayList<Students>();
+	static ArrayList<StudentGrade> listGrade = new ArrayList<StudentGrade>();
 	JRadioButton rdbtnNam = new JRadioButton("Nam");
 	JRadioButton rdbtnNu = new JRadioButton("Nữ");
 	JTextArea textDiaChi = new JTextArea();
 	JLabel lblAvatar = new JLabel("Avatar", JLabel.CENTER);
 	byte[] imageByte = null;
+	JLabel lblDiemTB = new JLabel("");
+	DecimalFormat fm = new DecimalFormat("#.#");
 
 	/**
 	 * Launch the application.
@@ -450,7 +454,6 @@ public class QLSV extends JFrame {
 		lblMaSV_1_1_1.setBounds(417, 167, 108, 19);
 		panelQLD.add(lblMaSV_1_1_1);
 
-		JLabel lblDiemTB = new JLabel("9.0");
 		lblDiemTB.setForeground(Color.BLUE);
 		lblDiemTB.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblDiemTB.setFont(new Font("Tahoma", Font.BOLD, 38));
@@ -458,6 +461,11 @@ public class QLSV extends JFrame {
 		panelQLD.add(lblDiemTB);
 
 		JButton btnFirst = new JButton("");
+		btnFirst.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				first();
+			}
+		});
 		btnFirst.setContentAreaFilled(false);
 		btnFirst.setBorder(null);
 		btnFirst.setIcon(new ImageIcon(
@@ -466,6 +474,11 @@ public class QLSV extends JFrame {
 		panelQLD.add(btnFirst);
 
 		JButton btnPrevious = new JButton("");
+		btnPrevious.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				previous();
+			}
+		});
 		btnPrevious.setContentAreaFilled(false);
 		btnPrevious.setBorder(null);
 		btnPrevious.setIcon(new ImageIcon(
@@ -474,6 +487,11 @@ public class QLSV extends JFrame {
 		panelQLD.add(btnPrevious);
 
 		JButton btnNext = new JButton("");
+		btnNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				next();
+			}
+		});
 		btnNext.setContentAreaFilled(false);
 		btnNext.setBorder(null);
 		btnNext.setIcon(
@@ -482,6 +500,11 @@ public class QLSV extends JFrame {
 		panelQLD.add(btnNext);
 
 		JButton btnLast = new JButton("");
+		btnLast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				last();
+			}
+		});
 		btnLast.setContentAreaFilled(false);
 		btnLast.setBorder(null);
 		btnLast.setIcon(
@@ -507,6 +530,8 @@ public class QLSV extends JFrame {
 		mntmDangXuat.addActionListener(logout);
 		rdbtnNam.setSelected(true);
 		btnSave.addActionListener(save);
+		textMaSV2.setEditable(false);
+		textHoTen2.setEditable(false);
 
 		lblAvatar.addMouseListener(new MouseAdapter() {
 			@Override
@@ -522,9 +547,6 @@ public class QLSV extends JFrame {
 				display(r);
 			}
 		});
-		loadData();
-		loadTable();
-		display(0);
 
 		btnNew.addActionListener(this.btnNew);
 		btnDelete.addActionListener(delete);
@@ -651,6 +673,20 @@ public class QLSV extends JFrame {
 		}
 
 	}
+	
+	public void loadData2() {
+		listGrade.removeAll(listGrade);
+		try {
+			listGrade = StudentDao.loadGrade();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 	public void loadTable() {
 		model1.setRowCount(0);
@@ -658,6 +694,14 @@ public class QLSV extends JFrame {
 			model1.addRow(new Object[] { ST.maSV, ST.hoTen, ST.email, ST.soDT, ST.gioiTinh, ST.diaChi });
 		});
 		table.setModel(model1);
+	}
+	
+	public void loadTable2() {
+		model2.setRowCount(0);
+		listGrade.forEach((ST) -> {
+			model2.addRow(new Object[] { ST.maSV,ST.hoTen, ST.tiengAnh, ST.tinHoc, ST.GDTC, fm.format(ST.getDTB())});
+		});
+		table_1.setModel(model2);
 	}
 
 	public void display(int i) {
@@ -681,6 +725,15 @@ public class QLSV extends JFrame {
 		}
 		imageByte = listStudent.get(i).hinh;
 		table.setRowSelectionInterval(i, i);
+	}
+	
+	public void display2(int i) {
+		textHoTen2.setText(listGrade.get(i).hoTen);
+		textMaSV2.setText(listGrade.get(i).maSV);
+		textTiengAnh.setText(String.valueOf(listGrade.get(i).tiengAnh));
+		textTinHoc.setText(String.valueOf(listGrade.get(i).tinHoc));
+		textGDTC.setText(String.valueOf(listGrade.get(i).GDTC));
+		lblDiemTB.setText(fm.format(listGrade.get(i).getDTB()));
 	}
 
 	ActionListener logout = new ActionListener() {
@@ -733,8 +786,14 @@ public class QLSV extends JFrame {
 	public void login() {
 		if (Login.vaiTro.equals("Giảng viên")) {
 			tabbedPane.addTab("Quản lý điểm", null, panelQLD, null);
+			loadData2();
+			loadTable2();
+			display2(0);
 		} else if (Login.vaiTro.equals("Cán bộ đào tạo")) {
 			tabbedPane.addTab("Quản lý sinh viên", new ImageIcon("Qu\u1EA3n l\u00FD sinh vi\u00EAn"), panelQLSV, null);
+			loadData();
+			loadTable();
+			display(0);
 		}
 	}
 
@@ -756,5 +815,31 @@ public class QLSV extends JFrame {
 		model1.addColumn("Giới tính");
 		model1.addColumn("Địa chỉ");
 		table.setModel(model1);
+	}
+	
+	public void first() {
+		current = 0;
+		display2(current);
+	}
+
+	public void last() {
+		current = listGrade.size() - 1;
+		display2(current);
+	}
+
+	public void next() {
+		current += 1;
+		if (current == listGrade.size()) {
+			current = 0;
+		}
+		display2(current);
+	}
+
+	public void previous() {
+		current -= 1;
+		if (current == -1) {
+			current = listGrade.size() - 1;
+		}
+		display2(current);
 	}
 }

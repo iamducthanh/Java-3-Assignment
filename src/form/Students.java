@@ -8,7 +8,7 @@ public class Students {
 	String gioiTinh;
 	String diaChi;
 	byte[] hinh;
-	
+
 	public Students(String maSV, String hoTen, String email, String soDT, String gioiTinh, String diaChi, byte[] hinh) {
 		super();
 		this.maSV = maSV;
@@ -19,8 +19,5 @@ public class Students {
 		this.diaChi = diaChi;
 		this.hinh = hinh;
 	}
-	
-	
-	
-	
+
 }

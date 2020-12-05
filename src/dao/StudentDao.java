@@ -10,16 +10,16 @@ import java.util.ArrayList;
 
 import javax.sql.rowset.serial.SerialBlob;
 
+import form.StudentGrade;
 import form.Students;
 import help.DataBaseConnection;
 
 public class StudentDao {
-	static String sqlUpdate = "UPDATE SinhVien SET MaSinhVien = ?,HoTen = ?,Email = ?,SoDT = ?,GioiTinh = ?,DiaChi = ?,Hinh = ? WHERE MaSV = ?";
 	public static ArrayList<Students> loadData() throws ClassNotFoundException, SQLException{
 		ArrayList<Students> listStudent = new ArrayList<Students>();
 		Connection connection = DataBaseConnection.Connect();
 		Statement statement = connection.createStatement();
-		ResultSet tbStudent = statement.executeQuery("SELECT * FROM SinhVien");
+		ResultSet tbStudent = statement.executeQuery("select * from SinhVien");
 		while(tbStudent.next()) {
 			String maSV = tbStudent.getString(1);
 			String hoTen = tbStudent.getString(2);
@@ -32,6 +32,23 @@ public class StudentDao {
 		}
 		connection.close();
 		return listStudent;
+	}
+	
+	public static ArrayList<StudentGrade> loadGrade() throws ClassNotFoundException, SQLException{
+		ArrayList<StudentGrade> listGrade = new ArrayList<StudentGrade>();
+		Connection connection = DataBaseConnection.Connect();
+		Statement statement = connection.createStatement();
+		ResultSet tbGrade = statement.executeQuery("select Diem.MaSinhVien, SinhVien.HoTen, TiengAnh, TinHoc, GDTC from Diem join SinhVien on Diem.MaSinhVien = SinhVien.MaSinhVien");
+		while(tbGrade.next()) {
+			String maSV = tbGrade.getString(1);
+			String hoTen = tbGrade.getString(2);
+			double tiengAnh = tbGrade.getDouble(3);
+			double tinHoc = tbGrade.getDouble(4);
+			double GDTC = tbGrade.getDouble(5);
+			listGrade.add(new StudentGrade(maSV, hoTen, tiengAnh, tinHoc, GDTC));
+		}
+		connection.close();
+		return listGrade;
 	}
 	
 	public static void insert(String maSV, String hoTen, String email, String soDT, String gioiTinh, String diaChi, byte[] imageByte) throws ClassNotFoundException, SQLException {
