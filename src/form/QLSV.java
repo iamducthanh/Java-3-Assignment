@@ -8,25 +8,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-import javax.sql.rowset.serial.SerialBlob;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -52,7 +40,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 import dao.StudentDao;
-import help.DataBaseConnection;
 import help.ImageEdit;
 
 public class QLSV extends JFrame {
@@ -73,8 +60,8 @@ public class QLSV extends JFrame {
 	private JTextField textTinHoc;
 	private JTable table_1;
 	JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-	JPanel panel = new JPanel();
-	JPanel panel_2 = new JPanel();
+	JPanel panelQLSV = new JPanel();
+	JPanel panelQLD = new JPanel();
 	static QLSV frame;
 	static ArrayList<Students> listStudent = new ArrayList<Students>();
 	JRadioButton rdbtnNam = new JRadioButton("Nam");
@@ -92,6 +79,7 @@ public class QLSV extends JFrame {
 				try {
 					frame = new QLSV();
 					frame.setLocationRelativeTo(null);
+					frame.setTitle("Quản lý sinh viên");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -181,51 +169,51 @@ public class QLSV extends JFrame {
 		tabbedPane.setBounds(10, 85, 763, 500);
 		contentPane.add(tabbedPane);
 
-		panel.setLayout(null);
+		panelQLSV.setLayout(null);
 
 		JLabel lblQLSV = new JLabel("Quản lý sinh viên");
 		lblQLSV.setForeground(Color.BLUE);
 		lblQLSV.setFont(new Font("Tahoma", Font.BOLD, 16));
 		lblQLSV.setBounds(10, 11, 292, 24);
-		panel.add(lblQLSV);
+		panelQLSV.add(lblQLSV);
 
 		JLabel lblMaSV = new JLabel("Mã sinh viên");
 		lblMaSV.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblMaSV.setBounds(70, 49, 74, 19);
-		panel.add(lblMaSV);
+		panelQLSV.add(lblMaSV);
 
 		JLabel lblDiaChi = new JLabel("Địa chỉ");
 		lblDiaChi.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblDiaChi.setBounds(102, 215, 42, 19);
-		panel.add(lblDiaChi);
+		panelQLSV.add(lblDiaChi);
 
 		textMaSV = new JTextField();
 		textMaSV.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textMaSV.setColumns(10);
 		textMaSV.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textMaSV.setBounds(165, 46, 230, 23);
-		panel.add(textMaSV);
+		panelQLSV.add(textMaSV);
 
 		textHoTen = new JTextField();
 		textHoTen.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textHoTen.setColumns(10);
 		textHoTen.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textHoTen.setBounds(165, 80, 230, 23);
-		panel.add(textHoTen);
+		panelQLSV.add(textHoTen);
 
 		textEmail = new JTextField();
 		textEmail.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textEmail.setColumns(10);
 		textEmail.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textEmail.setBounds(165, 114, 230, 23);
-		panel.add(textEmail);
+		panelQLSV.add(textEmail);
 
 		textSoDT = new JTextField();
 		textSoDT.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textSoDT.setColumns(10);
 		textSoDT.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textSoDT.setBounds(165, 148, 230, 23);
-		panel.add(textSoDT);
+		panelQLSV.add(textSoDT);
 
 		btnStudent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -247,15 +235,15 @@ public class QLSV extends JFrame {
 
 		rdbtnNam.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		rdbtnNam.setBounds(175, 180, 60, 23);
-		panel.add(rdbtnNam);
+		panelQLSV.add(rdbtnNam);
 
 		rdbtnNu.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		rdbtnNu.setBounds(235, 180, 111, 23);
-		panel.add(rdbtnNu);
+		panelQLSV.add(rdbtnNu);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(165, 216, 230, 69);
-		panel.add(scrollPane);
+		panelQLSV.add(scrollPane);
 
 		textDiaChi.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textDiaChi.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -264,27 +252,27 @@ public class QLSV extends JFrame {
 		JLabel lblHoTen = new JLabel("Họ tên");
 		lblHoTen.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblHoTen.setBounds(104, 83, 40, 19);
-		panel.add(lblHoTen);
+		panelQLSV.add(lblHoTen);
 
 		JLabel lblEmail = new JLabel("Email");
 		lblEmail.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblEmail.setBounds(111, 117, 33, 19);
-		panel.add(lblEmail);
+		panelQLSV.add(lblEmail);
 
 		JLabel lblSoDT = new JLabel("Số điện thoại");
 		lblSoDT.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblSoDT.setBounds(66, 151, 78, 19);
-		panel.add(lblSoDT);
+		panelQLSV.add(lblSoDT);
 
 		JLabel lblGioiTinh = new JLabel("Giới tính");
 		lblGioiTinh.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblGioiTinh.setBounds(95, 183, 49, 19);
-		panel.add(lblGioiTinh);
+		panelQLSV.add(lblGioiTinh);
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		panel_1.setBounds(481, 45, 128, 158);
-		panel.add(panel_1);
+		panelQLSV.add(panel_1);
 		panel_1.setLayout(null);
 
 		lblAvatar.setIcon(
@@ -297,7 +285,7 @@ public class QLSV extends JFrame {
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\clear.png"));
 		btnNew.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnNew.setBounds(453, 224, 89, 23);
-		panel.add(btnNew);
+		panelQLSV.add(btnNew);
 
 		JButton btnSave = new JButton("Save    ");
 		btnSave.addActionListener(new ActionListener() {
@@ -308,25 +296,25 @@ public class QLSV extends JFrame {
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\luu.png"));
 		btnSave.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnSave.setBounds(552, 224, 89, 23);
-		panel.add(btnSave);
+		panelQLSV.add(btnSave);
 
 		JButton btnDelete = new JButton("Delete");
 		btnDelete.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\delete.png"));
 		btnDelete.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnDelete.setBounds(453, 252, 89, 23);
-		panel.add(btnDelete);
+		panelQLSV.add(btnDelete);
 
 		JButton btnUpdate = new JButton("Update");
 		btnUpdate.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\update.png"));
 		btnUpdate.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnUpdate.setBounds(552, 252, 89, 23);
-		panel.add(btnUpdate);
+		panelQLSV.add(btnUpdate);
 
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(10, 303, 738, 158);
-		panel.add(scrollPane_1);
+		panelQLSV.add(scrollPane_1);
 
 		table = new JTable();
 		scrollPane_1.setViewportView(table);
@@ -335,79 +323,79 @@ public class QLSV extends JFrame {
 		gr.add(rdbtnNam);
 		gr.add(rdbtnNu);
 
-		panel_2.setLayout(null);
+		panelQLD.setLayout(null);
 
 		JLabel lblQunLim = new JLabel("Quản lý điểm");
 		lblQunLim.setForeground(Color.BLUE);
 		lblQunLim.setFont(new Font("Tahoma", Font.BOLD, 16));
 		lblQunLim.setBounds(10, 11, 292, 24);
-		panel_2.add(lblQunLim);
+		panelQLD.add(lblQunLim);
 
 		textMaSV2 = new JTextField();
 		textMaSV2.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textMaSV2.setColumns(10);
 		textMaSV2.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textMaSV2.setBounds(143, 131, 230, 23);
-		panel_2.add(textMaSV2);
+		panelQLD.add(textMaSV2);
 
 		textGDTC = new JTextField();
 		textGDTC.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textGDTC.setColumns(10);
 		textGDTC.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textGDTC.setBounds(143, 267, 230, 23);
-		panel_2.add(textGDTC);
+		panelQLD.add(textGDTC);
 
 		textHoTen2 = new JTextField();
 		textHoTen2.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textHoTen2.setColumns(10);
 		textHoTen2.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textHoTen2.setBounds(143, 165, 230, 23);
-		panel_2.add(textHoTen2);
+		panelQLD.add(textHoTen2);
 
 		textTiengAnh = new JTextField();
 		textTiengAnh.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textTiengAnh.setColumns(10);
 		textTiengAnh.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textTiengAnh.setBounds(143, 199, 230, 23);
-		panel_2.add(textTiengAnh);
+		panelQLD.add(textTiengAnh);
 
 		textTinHoc = new JTextField();
 		textTinHoc.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		textTinHoc.setColumns(10);
 		textTinHoc.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		textTinHoc.setBounds(143, 233, 230, 23);
-		panel_2.add(textTinHoc);
+		panelQLD.add(textTinHoc);
 
 		JLabel lblMaSV_1_1 = new JLabel("Mã sinh viên");
 		lblMaSV_1_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblMaSV_1_1.setBounds(50, 133, 74, 19);
-		panel_2.add(lblMaSV_1_1);
+		panelQLD.add(lblMaSV_1_1);
 
 		JLabel lblHoTen_1 = new JLabel("Họ tên");
 		lblHoTen_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblHoTen_1.setBounds(84, 167, 40, 19);
-		panel_2.add(lblHoTen_1);
+		panelQLD.add(lblHoTen_1);
 
 		JLabel lblTingAnh = new JLabel("Tiếng anh");
 		lblTingAnh.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblTingAnh.setBounds(65, 201, 59, 19);
-		panel_2.add(lblTingAnh);
+		panelQLD.add(lblTingAnh);
 
 		JLabel lblTinHc = new JLabel("Tin học");
 		lblTinHc.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblTinHc.setBounds(79, 235, 49, 19);
-		panel_2.add(lblTinHc);
+		panelQLD.add(lblTinHc);
 
 		JLabel lblGdtc = new JLabel("GDTC");
 		lblGdtc.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblGdtc.setBounds(89, 269, 39, 19);
-		panel_2.add(lblGdtc);
+		panelQLD.add(lblGdtc);
 
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(
 				new TitledBorder(null, "T\u00ECm ki\u1EBFm", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_3.setBounds(65, 46, 633, 58);
-		panel_2.add(panel_3);
+		panelQLD.add(panel_3);
 		panel_3.setLayout(null);
 
 		textMaSVSearch = new JTextField();
@@ -434,40 +422,40 @@ public class QLSV extends JFrame {
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\clear.png"));
 		btnNew_2.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnNew_2.setBounds(557, 132, 89, 23);
-		panel_2.add(btnNew_2);
+		panelQLD.add(btnNew_2);
 
 		JButton btnSave_1 = new JButton("Save   ");
 		btnSave_1.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\luu.png"));
 		btnSave_1.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnSave_1.setBounds(557, 166, 89, 23);
-		panel_2.add(btnSave_1);
+		panelQLD.add(btnSave_1);
 
 		JButton btnDelete_1 = new JButton("Delete");
 		btnDelete_1.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\delete.png"));
 		btnDelete_1.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnDelete_1.setBounds(557, 200, 89, 23);
-		panel_2.add(btnDelete_1);
+		panelQLD.add(btnDelete_1);
 
 		JButton btnUpdate_1 = new JButton("Update");
 		btnUpdate_1.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\update.png"));
 		btnUpdate_1.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnUpdate_1.setBounds(557, 234, 89, 23);
-		panel_2.add(btnUpdate_1);
+		panelQLD.add(btnUpdate_1);
 
 		JLabel lblMaSV_1_1_1 = new JLabel("Điểm trung bình");
 		lblMaSV_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblMaSV_1_1_1.setBounds(417, 167, 108, 19);
-		panel_2.add(lblMaSV_1_1_1);
+		panelQLD.add(lblMaSV_1_1_1);
 
 		JLabel lblDiemTB = new JLabel("9.0");
 		lblDiemTB.setForeground(Color.BLUE);
 		lblDiemTB.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblDiemTB.setFont(new Font("Tahoma", Font.BOLD, 38));
 		lblDiemTB.setBounds(400, 179, 94, 73);
-		panel_2.add(lblDiemTB);
+		panelQLD.add(lblDiemTB);
 
 		JButton btnFirst = new JButton("");
 		btnFirst.setContentAreaFilled(false);
@@ -475,7 +463,7 @@ public class QLSV extends JFrame {
 		btnFirst.setIcon(new ImageIcon(
 				"C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\previous.png"));
 		btnFirst.setBounds(143, 310, 49, 34);
-		panel_2.add(btnFirst);
+		panelQLD.add(btnFirst);
 
 		JButton btnPrevious = new JButton("");
 		btnPrevious.setContentAreaFilled(false);
@@ -483,7 +471,7 @@ public class QLSV extends JFrame {
 		btnPrevious.setIcon(new ImageIcon(
 				"C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\previous1.png"));
 		btnPrevious.setBounds(202, 310, 49, 34);
-		panel_2.add(btnPrevious);
+		panelQLD.add(btnPrevious);
 
 		JButton btnNext = new JButton("");
 		btnNext.setContentAreaFilled(false);
@@ -491,7 +479,7 @@ public class QLSV extends JFrame {
 		btnNext.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\next.png"));
 		btnNext.setBounds(261, 310, 49, 34);
-		panel_2.add(btnNext);
+		panelQLD.add(btnNext);
 
 		JButton btnLast = new JButton("");
 		btnLast.setContentAreaFilled(false);
@@ -499,11 +487,11 @@ public class QLSV extends JFrame {
 		btnLast.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\Last.png"));
 		btnLast.setBounds(320, 310, 49, 34);
-		panel_2.add(btnLast);
+		panelQLD.add(btnLast);
 
 		JScrollPane scrollPane_2 = new JScrollPane();
 		scrollPane_2.setBounds(10, 373, 738, 88);
-		panel_2.add(scrollPane_2);
+		panelQLD.add(scrollPane_2);
 
 		table_1 = new JTable();
 		scrollPane_2.setViewportView(table_1);
@@ -512,7 +500,7 @@ public class QLSV extends JFrame {
 		lblNewLabel.setForeground(Color.BLUE);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblNewLabel.setBounds(10, 355, 359, 14);
-		panel_2.add(lblNewLabel);
+		panelQLD.add(lblNewLabel);
 		table2();
 		login();
 		btnDangXuat.addActionListener(logout);
@@ -526,32 +514,23 @@ public class QLSV extends JFrame {
 				getAvatar();
 			}
 		});
-		
+
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int r = table.getSelectedRow();
-				try {
-					display(r);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				display(r);
 			}
 		});
 		loadData();
 		loadTable();
-		try {
-			display(0);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
+		display(0);
+
 		btnNew.addActionListener(this.btnNew);
 		btnDelete.addActionListener(delete);
+		btnUpdate.addActionListener(update);
 	}
-	
+
 	ActionListener btnNew = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			textMaSV.setText("");
@@ -561,9 +540,10 @@ public class QLSV extends JFrame {
 			textDiaChi.setText("");
 			rdbtnNam.setSelected(true);
 			lblAvatar.setIcon(null);
+			imageByte = null;
 		}
 	};
-	
+
 	public void getAvatar() {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new FileFilter() {
@@ -599,12 +579,12 @@ public class QLSV extends JFrame {
 			}
 		}
 	}
-	
+
 	ActionListener delete = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			int r = table.getSelectedRow();
 			int comfirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc muốn xóa sinh viên này!");
-			if(comfirm == 0) {
+			if (comfirm == 0) {
 				try {
 					StudentDao.delete(listStudent.get(r).maSV);
 					loadData();
@@ -617,13 +597,11 @@ public class QLSV extends JFrame {
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 			}
 		}
 	};
+	
 
 	ActionListener save = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -648,13 +626,11 @@ public class QLSV extends JFrame {
 					loadData();
 					loadTable();
 					display(0);
+					imageByte = null;
 				} catch (ClassNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -684,7 +660,7 @@ public class QLSV extends JFrame {
 		table.setModel(model1);
 	}
 
-	public void display(int i) throws IOException {
+	public void display(int i) {
 		textMaSV.setText(listStudent.get(i).maSV);
 		textHoTen.setText(listStudent.get(i).hoTen);
 		textEmail.setText(listStudent.get(i).email);
@@ -694,9 +670,16 @@ public class QLSV extends JFrame {
 			rdbtnNam.setSelected(true);
 		} else
 			rdbtnNu.setSelected(true);
-		Image icon = ImageEdit.getImage(listStudent.get(i).hinh, "img");
-		ImageIcon imageIcon = new ImageIcon(icon);
-		lblAvatar.setIcon(imageIcon);
+		Image icon;
+		try {
+			icon = ImageEdit.getImage(listStudent.get(i).hinh, "img");
+			ImageIcon imageIcon = new ImageIcon(icon);
+			lblAvatar.setIcon(imageIcon);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			lblAvatar.setIcon(null);
+		}
+		imageByte = listStudent.get(i).hinh;
 		table.setRowSelectionInterval(i, i);
 	}
 
@@ -710,11 +693,48 @@ public class QLSV extends JFrame {
 		}
 	};
 
+	ActionListener update = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int r = table.getSelectedRow();
+			StringBuilder error = new StringBuilder();
+			String maSV = textMaSV.getText();
+			String hoTen = textHoTen.getText();
+			String email = textEmail.getText();
+			String soDT = textSoDT.getText();
+			String gioiTinh = rdbtnNam.isSelected() == true ? "Nam" : "Nữ";
+			String diaChi = textDiaChi.getText();
+
+			error.append(Validate.checkMaUpdate(maSV, r, listStudent.size()));
+			error.append(Validate.checkTen(hoTen));
+			error.append(Validate.checkEmail(email));
+			error.append(Validate.checkSoDT(soDT));
+			error.append(Validate.checkDiaChi(diaChi));
+			if (!error.toString().isBlank()) {
+				JOptionPane.showMessageDialog(null, error, "Lỗi", JOptionPane.ERROR_MESSAGE);
+			} else {
+				try {
+					String maSV1 = listStudent.get(r).maSV;
+					StudentDao.update(maSV, hoTen, email, soDT, gioiTinh, diaChi, imageByte, maSV1);
+					loadData();
+					loadTable();
+					display(0);
+
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+	};
+
 	public void login() {
 		if (Login.vaiTro.equals("Giảng viên")) {
-			tabbedPane.addTab("Quản lý điểm", null, panel_2, null);
+			tabbedPane.addTab("Quản lý điểm", null, panelQLD, null);
 		} else if (Login.vaiTro.equals("Cán bộ đào tạo")) {
-			tabbedPane.addTab("Quản lý sinh viên", new ImageIcon("Qu\u1EA3n l\u00FD sinh vi\u00EAn"), panel, null);
+			tabbedPane.addTab("Quản lý sinh viên", new ImageIcon("Qu\u1EA3n l\u00FD sinh vi\u00EAn"), panelQLSV, null);
 		}
 	}
 

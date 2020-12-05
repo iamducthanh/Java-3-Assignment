@@ -27,6 +27,9 @@ public class ImageEdit {
 	}
 	
 	public static Image getImage(byte[] data, String type) throws IOException {
+		if(data == null) {
+			return null;
+		}
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		BufferedImage bimage = ImageIO.read(bais);
 		Image img = bimage.getScaledInstance(bimage.getWidth(), bimage.getHeight(), Image.SCALE_SMOOTH);

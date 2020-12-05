@@ -9,12 +9,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.sql.rowset.serial.SerialBlob;
-import javax.swing.JOptionPane;
 
 import form.Students;
 import help.DataBaseConnection;
 
 public class StudentDao {
+	static String sqlUpdate = "UPDATE SinhVien SET MaSinhVien = ?,HoTen = ?,Email = ?,SoDT = ?,GioiTinh = ?,DiaChi = ?,Hinh = ? WHERE MaSV = ?";
 	public static ArrayList<Students> loadData() throws ClassNotFoundException, SQLException{
 		ArrayList<Students> listStudent = new ArrayList<Students>();
 		Connection connection = DataBaseConnection.Connect();
@@ -52,7 +52,6 @@ public class StudentDao {
 		}
 		insert.execute();
 		connection.close();
-		imageByte = null;
 	}
 	
 	public static void delete(String maSV) throws ClassNotFoundException, SQLException {
@@ -63,7 +62,24 @@ public class StudentDao {
 		connection.close();
 	}
 	
-	public void update() {
-		
+	public static void update(String maSV, String hoTen, String email, String soDT, String gioiTinh, String diaChi, byte[] imageByte, String maSV1) throws ClassNotFoundException, SQLException {
+		Connection connection = DataBaseConnection.Connect();
+		PreparedStatement update = connection
+				.prepareStatement("UPDATE SinhVien SET MaSinhVien = ?,HoTen = ?,Email = ?,SoDT = ?,GioiTinh = ?,DiaChi = ?,Hinh = ? WHERE MaSinhVien = ?");
+		update.setString(1, maSV);
+		update.setString(2, hoTen);
+		update.setString(3, email);
+		update.setString(4, soDT);
+		update.setString(5, gioiTinh);
+		update.setString(6, diaChi);
+		if (imageByte == null) {
+			Blob hinh = null;
+			update.setBlob(7, hinh);
+		} else {
+			update.setBlob(7, new SerialBlob(imageByte));
+		}
+		update.setString(8, maSV1);
+		update.execute();
+		connection.close();
 	}
 }

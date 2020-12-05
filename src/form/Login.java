@@ -119,7 +119,7 @@ public class Login extends JFrame {
 		contentPane.add(btnLogin);
 
 		JLabel lblUser = new JLabel("New label");
-		lblUser.setIcon(new ImageIcon("src\\Image\\user.jpg"));
+		lblUser.setIcon(new ImageIcon("C:\\\\Users\\\\ADMIN\\\\eclipse-workspace\\\\Assignment_Java3_PH12794\\\\src\\Image\\user.jpg"));
 		lblUser.setBounds(10, 25, 122, 150);
 		contentPane.add(lblUser);
 
@@ -203,7 +203,7 @@ public class Login extends JFrame {
 		});
 		JLabel bkg = new JLabel();
 		bkg.setBounds(0, 0, 385, 262);
-		bkg.setIcon(new ImageIcon("src\\Image\\backLogin.jpg"));
+		bkg.setIcon(new ImageIcon("C:\\\\Users\\\\ADMIN\\\\eclipse-workspace\\\\Assignment_Java3_PH12794\\\\src\\Image\\backLogin.jpg"));
 		contentPane.add(bkg);
 		loadUser();
 	}
