@@ -9,10 +9,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
@@ -21,14 +18,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import help.DataBaseConnection;
+import dao.UserDao;
+import entities.Users;
 
 @SuppressWarnings("serial")
 public class Login extends JFrame {
@@ -103,7 +100,8 @@ public class Login extends JFrame {
 		lblLogin.setFont(new Font("Tahoma", Font.BOLD, 19));
 		lblLogin.setBounds(145, 11, 257, 40);
 		contentPane.add(lblLogin);
-		btnLogin.setIcon(new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\login.png"));
+		btnLogin.setIcon(
+				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\login.png"));
 
 		btnLogin.setForeground(Color.BLACK);
 		btnLogin.addActionListener(new ActionListener() {
@@ -118,7 +116,8 @@ public class Login extends JFrame {
 		contentPane.add(btnLogin);
 
 		JLabel lblUser = new JLabel("New label");
-		lblUser.setIcon(new ImageIcon("C:\\\\Users\\\\ADMIN\\\\eclipse-workspace\\\\Assignment_Java3_PH12794\\\\src\\Image\\user.jpg"));
+		lblUser.setIcon(new ImageIcon(
+				"C:\\\\Users\\\\ADMIN\\\\eclipse-workspace\\\\Assignment_Java3_PH12794\\\\src\\Image\\user.jpg"));
 		lblUser.setBounds(10, 25, 122, 150);
 		contentPane.add(lblUser);
 
@@ -174,21 +173,22 @@ public class Login extends JFrame {
 		});
 
 		btnLogin.setContentAreaFilled(false);
-		
+
 		JButton btnCancel = new JButton("Cancel ");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
-		btnCancel.setIcon(new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\exit.png"));
+		btnCancel.setIcon(
+				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\exit.png"));
 		btnCancel.setForeground(Color.BLACK);
 		btnCancel.setContentAreaFilled(false);
 		btnCancel.setBorder(new LineBorder(Color.DARK_GRAY));
 		btnCancel.setBackground(Color.BLACK);
 		btnCancel.setBounds(244, 152, 89, 23);
 		contentPane.add(btnCancel);
-		
+
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -204,49 +204,42 @@ public class Login extends JFrame {
 		});
 		JLabel bkg = new JLabel();
 		bkg.setBounds(0, 0, 385, 262);
-		bkg.setIcon(new ImageIcon("C:\\\\Users\\\\ADMIN\\\\eclipse-workspace\\\\Assignment_Java3_PH12794\\\\src\\Image\\backLogin.jpg"));
+		bkg.setIcon(new ImageIcon(
+				"C:\\\\Users\\\\ADMIN\\\\eclipse-workspace\\\\Assignment_Java3_PH12794\\\\src\\Image\\backLogin.jpg"));
 		contentPane.add(bkg);
 		loadUser();
 	}
-	
-	@SuppressWarnings("unlikely-arg-type")
+
 	public void loadUser() {
 		try {
-			Connection connection = DataBaseConnection.Connect();
-			Statement statement = connection.createStatement();
-			ResultSet tbUser = statement.executeQuery("SELECT * FROM NguoiDung");
-			while(tbUser.next()) {
-				listUser.remove(listUser);
-				String username = tbUser.getString(1);
-				String password = tbUser.getString(2);
-				String vaiTro = tbUser.getString(3);
-				listUser.add(new Users(username, password, vaiTro));
-			}
-			connection.close();
-		} catch (ClassNotFoundException | SQLException e) {
+			listUser = UserDao.loadUser();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void login() {
-		login = false;
-		String username = textUsername.getText();
-		@SuppressWarnings("deprecation")
-		String password = textPassword.getText();
-		listUser.forEach((user) -> {
-			if(user.username.equals(username)) {
-				if(user.password.equals(password)) {
-					login = true;
-					vaiTro = user.vaiTro;
-					QLSV qlsv = new QLSV();
-					qlsv.mainQLSV();
-					Login.frame.setVisible(false);
-				}
-			}
-		});
-		if(login == false) {
-			JOptionPane.showMessageDialog(null, "Thông tin đăng nhập không chính xác!");
-		}
+//		login = false;
+//		String username = textUsername.getText();
+//		@SuppressWarnings("deprecation")
+//		String password = textPassword.getText();
+//		listUser.forEach((user) -> {
+//			if(user.username.equals(username)) {
+//				if(user.password.equals(password)) {
+//					login = true;
+		vaiTro = "Giảng viên";
+		QLSV qlsv = new QLSV();
+		qlsv.mainQLSV();
+		Login.frame.setVisible(false);
+//				}
+//			}
+//		});
+//		if(login == false) {
+//			JOptionPane.showMessageDialog(null, "Thông tin đăng nhập không chính xác!");
+//		}
 	}
 }

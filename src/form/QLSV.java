@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -39,8 +40,13 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
+import dao.GradeDao;
 import dao.StudentDao;
+import entities.StudentGrade;
+import entities.Students;
 import help.ImageEdit;
+import help.ValidateGrade;
+import help.ValidateStudent;
 
 @SuppressWarnings("serial")
 public class QLSV extends JFrame {
@@ -64,7 +70,7 @@ public class QLSV extends JFrame {
 	JPanel panelQLSV = new JPanel();
 	JPanel panelQLD = new JPanel();
 	static QLSV frame;
-	static ArrayList<Students> listStudent = new ArrayList<Students>();
+	public static ArrayList<Students> listStudent = new ArrayList<Students>();
 	static ArrayList<StudentGrade> listGrade = new ArrayList<StudentGrade>();
 	JRadioButton rdbtnNam = new JRadioButton("Nam");
 	JRadioButton rdbtnNu = new JRadioButton("Nữ");
@@ -73,6 +79,10 @@ public class QLSV extends JFrame {
 	byte[] imageByte = null;
 	JLabel lblDiemTB = new JLabel("");
 	DecimalFormat fm = new DecimalFormat("#.#");
+	JButton btnSave_1 = new JButton("Save   ");
+	JButton btnCancel = new JButton("Cancel");
+	JButton btnUpdate_1 = new JButton("Update");
+	JButton btnDelete_1 = new JButton("Delete");
 
 	/**
 	 * Launch the application.
@@ -427,22 +437,20 @@ public class QLSV extends JFrame {
 		btnNew_2.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnNew_2.setBounds(557, 132, 89, 23);
 		panelQLD.add(btnNew_2);
+		btnSave_1.setEnabled(false);
 
-		JButton btnSave_1 = new JButton("Save   ");
 		btnSave_1.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\luu.png"));
 		btnSave_1.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnSave_1.setBounds(557, 166, 89, 23);
 		panelQLD.add(btnSave_1);
 
-		JButton btnDelete_1 = new JButton("Delete");
 		btnDelete_1.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\delete.png"));
 		btnDelete_1.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnDelete_1.setBounds(557, 200, 89, 23);
 		panelQLD.add(btnDelete_1);
 
-		JButton btnUpdate_1 = new JButton("Update");
 		btnUpdate_1.setIcon(
 				new ImageIcon("C:\\Users\\ADMIN\\eclipse-workspace\\Assignment_Java3_PH12794\\src\\Image\\update.png"));
 		btnUpdate_1.setBorder(new BevelBorder(BevelBorder.RAISED));
@@ -529,9 +537,14 @@ public class QLSV extends JFrame {
 		btnDangXuat.addActionListener(logout);
 		mntmDangXuat.addActionListener(logout);
 		rdbtnNam.setSelected(true);
-		btnSave.addActionListener(save);
+		btnSave.addActionListener(saveStudent);
 		textMaSV2.setEditable(false);
 		textHoTen2.setEditable(false);
+		
+		btnCancel.setVisible(false);
+		btnCancel.setBorder(new BevelBorder(BevelBorder.RAISED));
+		btnCancel.setBounds(557, 200, 89, 23);
+		panelQLD.add(btnCancel);
 
 		lblAvatar.addMouseListener(new MouseAdapter() {
 			@Override
@@ -549,9 +562,33 @@ public class QLSV extends JFrame {
 		});
 
 		btnNew.addActionListener(this.btnNew);
+		btnNew_2.addActionListener(btnNew2);
 		btnDelete.addActionListener(delete);
 		btnUpdate.addActionListener(update);
+		btnSearch.addActionListener(search);
+		btnCancel.addActionListener(cancel);
+		btnSave_1.addActionListener(saveGrade);
 	}
+	
+	ActionListener search = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int i;
+			if(!textMaSVSearch.getText().isBlank()) {
+				String search = textMaSVSearch.getText();
+				for(i=0;i<listGrade.size();i++) {
+					if(listGrade.get(i).maSV.equalsIgnoreCase(search)) {
+						break;
+					}
+				}
+				if(i == listGrade.size()) {
+					JOptionPane.showMessageDialog(null, "Không tìm thấy sinh viên có mã: "+ search);
+				} else {
+					display2(i);
+					JOptionPane.showMessageDialog(null, "Đã tìm thấy!");
+				}
+			}
+		}
+	};
 
 	ActionListener btnNew = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -563,6 +600,35 @@ public class QLSV extends JFrame {
 			rdbtnNam.setSelected(true);
 			lblAvatar.setIcon(null);
 			imageByte = null;
+		}
+	};
+	
+	ActionListener btnNew2 = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			btnSave_1.setEnabled(true);
+			textMaSV2.setText("");
+			textMaSV2.setEditable(true);
+			textHoTen2.setText("");
+			textHoTen2.setEditable(true);
+			textTiengAnh.setText("");
+			textTinHoc.setText("");
+			textGDTC.setText("");
+			btnCancel.setVisible(true);
+			btnDelete_1.setVisible(false);
+			btnUpdate_1.setVisible(false);
+			lblDiemTB.setText("");
+		}
+	};
+	
+	ActionListener cancel = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			btnSave_1.setEnabled(false);
+			textMaSV2.setEditable(false);
+			textHoTen2.setEditable(false);
+			btnCancel.setVisible(false);
+			btnDelete_1.setVisible(true);
+			btnUpdate_1.setVisible(true);
+			display2(current);
 		}
 	};
 
@@ -625,7 +691,7 @@ public class QLSV extends JFrame {
 	};
 	
 
-	ActionListener save = new ActionListener() {
+	ActionListener saveStudent = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			StringBuilder error = new StringBuilder();
 			String maSV = textMaSV.getText();
@@ -635,11 +701,11 @@ public class QLSV extends JFrame {
 			String gioiTinh = rdbtnNam.isSelected() == true ? "Nam" : "Nữ";
 			String diaChi = textDiaChi.getText();
 
-			error.append(Validate.checkMa(maSV));
-			error.append(Validate.checkTen(hoTen));
-			error.append(Validate.checkEmail(email));
-			error.append(Validate.checkSoDT(soDT));
-			error.append(Validate.checkDiaChi(diaChi));
+			error.append(ValidateStudent.checkMa(maSV));
+			error.append(ValidateStudent.checkTen(hoTen));
+			error.append(ValidateStudent.checkEmail(email));
+			error.append(ValidateStudent.checkSoDT(soDT));
+			error.append(ValidateStudent.checkDiaChi(diaChi));
 			if (!error.toString().isBlank()) {
 				JOptionPane.showMessageDialog(null, error, "Lỗi", JOptionPane.ERROR_MESSAGE);
 			} else {
@@ -656,6 +722,41 @@ public class QLSV extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+			}
+		}
+	};
+	
+	ActionListener saveGrade = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			StringBuilder error = new StringBuilder();
+			String maSV = textMaSV2.getText();
+			String hoTen = textHoTen2.getText();
+			String tiengAnh = textTiengAnh.getText();
+			String tinHoc = textTinHoc.getText();
+			String GDTC = textGDTC.getText();
+			error.append(ValidateGrade.checkMaSV(maSV, listGrade));
+			error.append(ValidateGrade.checkTen(hoTen));
+			error.append(ValidateGrade.checkSo(tiengAnh, tinHoc, GDTC));
+			error.append(ValidateGrade.checkSV(maSV, hoTen));
+			if(error.toString().isBlank()) {
+				try {
+//					float tiengAnhFloat = Float.parseFloat(fm.format(Double.parseDouble(tiengAnh)));
+//					float tinHocFloat = Float.parseFloat(fm.format(Double.parseDouble(tinHoc)));
+//					float GDTCFloat = Float.parseFloat(fm.format(Double.parseDouble(GDTC)));
+					GradeDao.insertGrade(maSV, tiengAnh, tinHoc, GDTC);
+					loadData2();
+					loadTable2();
+					cancel.actionPerformed(e);
+					JOptionPane.showMessageDialog(null, "Save thành công!");
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, error.toString(),"Lỗi",JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	};
@@ -677,7 +778,7 @@ public class QLSV extends JFrame {
 	public void loadData2() {
 		listGrade.removeAll(listGrade);
 		try {
-			listGrade = StudentDao.loadGrade();
+			listGrade = GradeDao.loadGrade();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -698,10 +799,25 @@ public class QLSV extends JFrame {
 	
 	public void loadTable2() {
 		model2.setRowCount(0);
-		listGrade.forEach((ST) -> {
-			model2.addRow(new Object[] { ST.maSV,ST.hoTen, ST.tiengAnh, ST.tinHoc, ST.GDTC, fm.format(ST.getDTB())});
+		ArrayList<StudentGrade> listTop = new ArrayList<>();
+		listTop = listGrade;
+		Collections.sort(listTop, (o1, o2) -> {
+			return o1.getDTB() < o2.getDTB() ? 1 : -1;
 		});
+		for(int i=0;i<3;i++) {
+			model2.addRow(new Object[] { listTop.get(i).maSV, listStudent.get(getHoTen(listTop.get(i).maSV)).hoTen, listTop.get(i).tiengAnh, listTop.get(i).tinHoc, listTop.get(i).GDTC, fm.format(listTop.get(i).getDTB())});
+		}
 		table_1.setModel(model2);
+	}
+	
+	public int getHoTen(String maSV) {
+		int i = 0;
+		for (; i < listStudent.size(); i++) {
+			if(listStudent.get(i).maSV.equalsIgnoreCase(maSV)) {
+				return i;
+			}
+		}
+		return i;
 	}
 
 	public void display(int i) {
@@ -728,7 +844,7 @@ public class QLSV extends JFrame {
 	}
 	
 	public void display2(int i) {
-		textHoTen2.setText(listGrade.get(i).hoTen);
+		textHoTen2.setText(listStudent.get(getHoTen(listGrade.get(i).maSV)).hoTen);
 		textMaSV2.setText(listGrade.get(i).maSV);
 		textTiengAnh.setText(String.valueOf(listGrade.get(i).tiengAnh));
 		textTinHoc.setText(String.valueOf(listGrade.get(i).tinHoc));
@@ -757,11 +873,11 @@ public class QLSV extends JFrame {
 			String gioiTinh = rdbtnNam.isSelected() == true ? "Nam" : "Nữ";
 			String diaChi = textDiaChi.getText();
 
-			error.append(Validate.checkMaUpdate(maSV, r, listStudent.size()));
-			error.append(Validate.checkTen(hoTen));
-			error.append(Validate.checkEmail(email));
-			error.append(Validate.checkSoDT(soDT));
-			error.append(Validate.checkDiaChi(diaChi));
+			error.append(ValidateStudent.checkMaUpdate(maSV, r, listStudent.size()));
+			error.append(ValidateStudent.checkTen(hoTen));
+			error.append(ValidateStudent.checkEmail(email));
+			error.append(ValidateStudent.checkSoDT(soDT));
+			error.append(ValidateStudent.checkDiaChi(diaChi));
 			if (!error.toString().isBlank()) {
 				JOptionPane.showMessageDialog(null, error, "Lỗi", JOptionPane.ERROR_MESSAGE);
 			} else {
@@ -771,7 +887,7 @@ public class QLSV extends JFrame {
 					loadData();
 					loadTable();
 					display(0);
-
+					JOptionPane.showMessageDialog(null, "Update thành công!");
 				} catch (ClassNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -786,6 +902,7 @@ public class QLSV extends JFrame {
 	public void login() {
 		if (Login.vaiTro.equals("Giảng viên")) {
 			tabbedPane.addTab("Quản lý điểm", null, panelQLD, null);
+			loadData();
 			loadData2();
 			loadTable2();
 			display2(0);
