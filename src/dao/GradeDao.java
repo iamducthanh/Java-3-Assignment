@@ -38,4 +38,24 @@ public class GradeDao {
 		insert.execute();
 		connection.close();
 	}
+	
+	public static void update(String maSV, String tiengAnh, String tinHoc, String GDTC) throws ClassNotFoundException, SQLException {
+		Connection connection = DataBaseConnection.Connect();
+		PreparedStatement update = connection
+				.prepareStatement("UPDATE Diem SET TiengAnh = ?,TinHoc = ?,GDTC = ? WHERE MaSinhVien = ?");
+		update.setString(1, tiengAnh);
+		update.setString(2, tinHoc);
+		update.setString(3, GDTC);
+		update.setString(4, maSV);
+		update.execute();
+		connection.close();
+	}
+	
+	public static void delete(String maSV) throws ClassNotFoundException, SQLException {
+		Connection connection = DataBaseConnection.Connect();
+		PreparedStatement delete = connection.prepareStatement("DELETE FROM Diem WHERE MaSinhVien = ?");
+		delete.setString(1, maSV);
+		delete.execute();
+		connection.close();
+	}
 }

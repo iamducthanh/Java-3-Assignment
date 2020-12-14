@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -223,23 +224,23 @@ public class Login extends JFrame {
 	}
 
 	public void login() {
-//		login = false;
-//		String username = textUsername.getText();
-//		@SuppressWarnings("deprecation")
-//		String password = textPassword.getText();
-//		listUser.forEach((user) -> {
-//			if(user.username.equals(username)) {
-//				if(user.password.equals(password)) {
-//					login = true;
-		vaiTro = "Giảng viên";
+		login = false;
+		String username = textUsername.getText();
+		@SuppressWarnings("deprecation")
+		String password = textPassword.getText();
+		listUser.forEach((user) -> {
+			if(user.username.equals(username)) {
+				if(user.password.equals(password)) {
+					login = true;
+		vaiTro = user.vaiTro;
 		QLSV qlsv = new QLSV();
 		qlsv.mainQLSV();
 		Login.frame.setVisible(false);
-//				}
-//			}
-//		});
-//		if(login == false) {
-//			JOptionPane.showMessageDialog(null, "Thông tin đăng nhập không chính xác!");
-//		}
+				}
+			}
+		});
+		if(login == false) {
+			JOptionPane.showMessageDialog(null, "Thông tin đăng nhập không chính xác!");
+		}
 	}
 }

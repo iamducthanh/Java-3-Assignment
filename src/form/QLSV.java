@@ -540,7 +540,6 @@ public class QLSV extends JFrame {
 		btnSave.addActionListener(saveStudent);
 		textMaSV2.setEditable(false);
 		textHoTen2.setEditable(false);
-		
 		btnCancel.setVisible(false);
 		btnCancel.setBorder(new BevelBorder(BevelBorder.RAISED));
 		btnCancel.setBounds(557, 200, 89, 23);
@@ -568,7 +567,35 @@ public class QLSV extends JFrame {
 		btnSearch.addActionListener(search);
 		btnCancel.addActionListener(cancel);
 		btnSave_1.addActionListener(saveGrade);
+		btnUpdate_1.addActionListener(updateGrade);
+		btnDelete_1.addActionListener(deleteGrade);
 	}
+	
+	ActionListener updateGrade = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			StringBuilder error = new StringBuilder();
+			String tiengAnh = textTiengAnh.getText();
+			String tinHoc = textTinHoc.getText();
+			String GDTC = textGDTC.getText();
+			error.append(ValidateGrade.checkSo(tiengAnh, tinHoc, GDTC));
+			if(!error.toString().isBlank()) {
+				JOptionPane.showMessageDialog(null, error.toString(),"Lỗi",JOptionPane.ERROR_MESSAGE);
+			} else {
+				try {
+					GradeDao.update(textMaSV2.getText(), tiengAnh, tinHoc, GDTC);
+					loadData2();
+					loadTable2();
+					JOptionPane.showMessageDialog(null, "Update thành công!");
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+	};
 	
 	ActionListener search = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -690,7 +717,28 @@ public class QLSV extends JFrame {
 		}
 	};
 	
-
+	ActionListener deleteGrade = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int r = table.getSelectedRow();
+			int comfirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc muốn điểm của sinh viên này!");
+			if (comfirm == 0) {
+				try {
+					GradeDao.delete(textMaSV2.getText());
+					loadData2();
+					loadTable2();
+					display2(0);
+					JOptionPane.showMessageDialog(null, "Xóa thành công!");
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+	};
+	
 	ActionListener saveStudent = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			StringBuilder error = new StringBuilder();
@@ -715,6 +763,7 @@ public class QLSV extends JFrame {
 					loadTable();
 					display(0);
 					imageByte = null;
+					JOptionPane.showMessageDialog(null, "Thêm thành công!");
 				} catch (ClassNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -740,9 +789,6 @@ public class QLSV extends JFrame {
 			error.append(ValidateGrade.checkSV(maSV, hoTen));
 			if(error.toString().isBlank()) {
 				try {
-//					float tiengAnhFloat = Float.parseFloat(fm.format(Double.parseDouble(tiengAnh)));
-//					float tinHocFloat = Float.parseFloat(fm.format(Double.parseDouble(tinHoc)));
-//					float GDTCFloat = Float.parseFloat(fm.format(Double.parseDouble(GDTC)));
 					GradeDao.insertGrade(maSV, tiengAnh, tinHoc, GDTC);
 					loadData2();
 					loadTable2();
